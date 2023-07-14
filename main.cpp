@@ -13,10 +13,10 @@ int main(int argc, char *argv[])
 	std::string  testStr{ "hehe" };
 	std::stringstream strStream;
 	//ost.open("test.txt");
-	auto sizeOut = StreamSerializer<long long>::serialize(strStream, testNumber);
-	StreamSerializer<short>::serialize(strStream, testShort);
-	StreamSerializer<char>::serialize(strStream, testChar);
-	StreamSerializer<std::string>::serialize(strStream, testStr);
+	//auto sizeOut = StreamSerializer<long long>::serialize(strStream, testNumber);
+	//StreamSerializer<short>::serialize(strStream, testShort);
+	//StreamSerializer<char>::serialize(strStream, testChar);
+	StreamSerializer<std::string,std::string>::serialize(strStream, testStr);
 	//ost.close();
 
 	long long testOutLong = 0;
@@ -25,11 +25,12 @@ int main(int argc, char *argv[])
 	std::string testOutStr;
 	//std::stringstream ost;
 	//std::ifstream ist("test.txt");
-	size_t sizeIn = StreamSerializer<long long>::deserialize(strStream, testOutLong);
-	sizeIn = StreamSerializer<short>::deserialize(strStream, testOutShort);
-	sizeIn = StreamSerializer<char>::deserialize(strStream, testOutChar);
-	sizeIn = StreamSerializer<std::string>::deserialize(strStream, testOutStr);
-	std::cout << "Size:" << sizeIn << " Values: " << testOutLong << '\t' << testOutShort << '\t' << testOutChar << '\t' << testOutStr << '\n';
+	//size_t sizeIn = StreamSerializer<long long>::deserialize(strStream, testOutLong);
+	//sizeIn = StreamSerializer<short>::deserialize(strStream, testOutShort);
+//	sizeIn = StreamSerializer<char>::deserialize(strStream, testOutChar);
+	size_t sizeIn = StreamSerializer<std::string, std::string>::deserialize(strStream, testOutStr);
+	std::cout << testOutStr;
+	//std::cout << "Size:" << sizeIn << " Values: " << testOutLong << '\t' << testOutShort << '\t' << testOutChar << '\t' << testOutStr << '\n';
 	int in;
 	std::cin >> in;
 //	ist.close();
