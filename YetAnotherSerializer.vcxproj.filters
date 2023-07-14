@@ -13,4 +13,9 @@
       <Filter>Main</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Serializer.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

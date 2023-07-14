@@ -1,33 +1,9 @@
-#include  <iostream>
 
-template<typename T>
-using only_if_string =
-std::enable_if_t<std::is_same_v<T, std::string>>;
-
-constexpr auto t_value = static_cast<std::uint8_t>('T');
-constexpr auto f_value = static_cast<std::uint8_t>('F');
-
-template<typename T = void, typename U = void>
-class StreamSerializer
-{
-public:
-	static auto serialize(std::ostream& os, const T& value);
-	static auto serialize(std::ostream& os, only_if_string<T>& value);
-	static auto serialize(std::ostream& os, bool& value);
-};
-
-template<typename T = void, typename U = void>
-class StreamDeserializer
-{
-public:
-	static auto deserialize(std::istream& is, const T& value);
-	static auto deserialize(std::istream& is, only_if_string<T>& value);
-	static auto deserialize(std::istream& is, bool& value);
-};
+#include "Serializer.h"
 
 
 template<typename T, typename U>
-auto StreamSerializer<T, U>::serialize(std::ostream& os, const T& value)
+int StreamSerializer<T, U>::serialize(std::ofstream& os, const T& value)
 {
 	const auto pos = os.tellp();
 	os.write(reinterpret_cast<const char*>(&value), sizeof(value));
@@ -37,7 +13,7 @@ auto StreamSerializer<T, U>::serialize(std::ostream& os, const T& value)
 
 
 template<typename T, typename U>
-auto StreamSerializer<T, U>::serialize(std::ostream& os, bool& value)
+int StreamSerializer<T, U>::serialize(std::ofstream& os, bool& value)
 {
 	const auto pos = os.tellp();
 	const auto tmp = (value) ? t_value : f_value;
@@ -46,7 +22,7 @@ auto StreamSerializer<T, U>::serialize(std::ostream& os, bool& value)
 }
 
 template<typename T, typename U>
-auto StreamSerializer<T, U>::serialize(std::ostream& os, only_if_string<T>& value)
+int StreamSerializer<T, U>::serialize(std::ofstream& os, only_if_string<T>& value)
 {
 	const auto pos = os.tellp();
 	const auto len = static_cast<std::uint32_t>(value.size());
@@ -59,7 +35,7 @@ auto StreamSerializer<T, U>::serialize(std::ostream& os, only_if_string<T>& valu
 
 
 template<typename T, typename U>
-auto StreamDeserializer<T, U>::deserialize(std::istream& is, const T& value)
+int StreamDeserializer<T, U>::deserialize(std::ifstream& is, const T& value)
 {
 	const auto pos = is.tellp();
 	is.read(reinterpret_cast<const char*>(&value), sizeof(value));
@@ -68,7 +44,7 @@ auto StreamDeserializer<T, U>::deserialize(std::istream& is, const T& value)
 
 
 template<typename T, typename U>
-auto StreamDeserializer<T, U>::deserialize(std::istream& is, bool& value)
+int StreamDeserializer<T, U>::deserialize(std::ifstream& is, bool& value)
 {
 	const auto pos = is.tellp();
 	is.read(reinterpret_cast<const char*>(&tmp), sizeof(tmp));
@@ -82,7 +58,7 @@ auto StreamDeserializer<T, U>::deserialize(std::istream& is, bool& value)
 
 // а как со строками?
 template<typename T, typename U>
-auto StreamDeserializer<T, U>::deserialize(std::istream& is, only_if_string<T>& value)
+int StreamDeserializer<T, U>::deserialize(std::ifstream& is, only_if_string<T>& value)
 {
 	const auto pos = os.tellp();
 	std::uint32_t len;
