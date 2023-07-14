@@ -4,14 +4,18 @@
 
 int main(int argc, char *argv[])
 {
-	int  TestNumber{ 442231 };
+	int  TestNumber{ 4231 };
 	std::ofstream ost;
 	ost.open("test.txt");
 	auto sizeOut = StreamSerializer<int>::serialize(ost, TestNumber);
 	ost.close();
+
+	int testOut = 0;
 	std::ifstream ist("test.txt");
-	ist.open("test.txt");
-	auto sizeIn = StreamDeserializer<int>::deserialize(ist, TestNumber);
+	testOut = StreamSerializer<int>::deserialize(ist);
+	std::cout << testOut << '\n';
+	int in;
+	std::cin >> in;
 	ist.close();
  	return 0; //hihishka
 }
