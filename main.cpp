@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 	//sizeIn = StreamSerializer<short>::deserialize(strStream, testOutShort);
 //	sizeIn = StreamSerializer<char>::deserialize(strStream, testOutChar);
 	size_t sizeIn = StreamSerializer<std::string, std::string>::deserialize(strStream, testOutStr);
-	std::cout << testOutStr;
+	std::cout << testOutStr<< "  "<< testStr;
 	//std::cout << "Size:" << sizeIn << " Values: " << testOutLong << '\t' << testOutShort << '\t' << testOutChar << '\t' << testOutStr << '\n';
 	int in;
 	std::cin >> in;
