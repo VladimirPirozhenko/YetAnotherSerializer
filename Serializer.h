@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 #include <type_traits>
 
 //template<typename T>
@@ -19,38 +20,7 @@ public:
 
 };
 
-template<typename T>
-class StreamSerializer<T, typename std::enable_if<std::is_same<T, std::string>::value, T>::type>
-{
-public:
-	template<typename T>
-	static size_t serialize(std::ostream& os, const T& value)
-	{
-		const auto pos = os.tellp();
-		const auto len = static_cast<std::uint32_t>(value.size());
-		os.write(reinterpret_cast<const char*>(&len), sizeof(len));
-		if (len > 0)
-			os.write(value.data(), len);
-		return static_cast<std::size_t>(os.tellp() - pos);
-	};
-
-	template<typename T>
-	static size_t deserialize(std::istream& is, T& value)
-	{
-		std::ostringstream os;
-		std::uint32_t len;
-		is.read(reinterpret_cast<char*>(&len), sizeof(len));
-		if (len > 0)
-		{
-			os << is.rdbuf();
-			value = os.str();
-		}
-			//is.read(reinterpret_cast<char*>(const_cast<char*>(value.data())), len);
-		return static_cast<std::size_t>(len);
-	};
-};
-
-
+// Ѕј«ќ¬јя –≈јЋ»«ј÷»я
 template<typename T, typename U = void>
 size_t StreamSerializer<T,U>::serialize(std::ostream& os, const T& value)
 {
@@ -67,38 +37,93 @@ size_t StreamSerializer<T, U>::deserialize(std::istream& is, T& value)
 	return static_cast<std::size_t>(is.tellg() - pos);
 }
 
-
-
-
-template<>
-size_t StreamSerializer<bool>::serialize(std::ostream& os,const bool& balue)
+// —ѕ≈÷»јЋ»«ј÷»я ƒЋя Ѕ”Ћќ¬
+ template<>
+class StreamSerializer<bool>
 {
-	const auto pos = os.tellp();
-	const auto tmp = (balue) ? t_value : f_value;
-	os.write(reinterpret_cast<const char*>(&tmp), sizeof(tmp));
-	return static_cast<std::size_t>(os.tellp() - pos);
-}
-
-template<>
-size_t StreamSerializer<bool>::deserialize(std::istream& is, bool& balue)
-{
-	char tmp;
-	is.read(&tmp, sizeof(tmp));
-	switch (tmp)
+public:
+	static size_t serialize(std::ostream& os, const bool& balue)
 	{
-	case t_value:
-		balue = true;
-		break;
-	case f_value:
-		balue = false;
-		break;
-	default: // ошибку лов€т тесты
-		break;
+		const auto pos = os.tellp();
+		const auto tmp = (balue) ? t_value : f_value;
+		os.write(reinterpret_cast<const char*>(&tmp), sizeof(tmp));
+		return static_cast<std::size_t>(os.tellp() - pos);
+	};
+
+	static size_t deserialize(std::istream& is, bool& balue)
+	{
+		char tmp;
+		is.read(&tmp, sizeof(tmp));
+		switch (tmp)
+		{
+		case t_value:
+			balue = true;
+			break;
+		case f_value:
+			balue = false;
+			break;
+		default: // ошибку лов€т тесты
+			break;
+		}
+		return static_cast<std::size_t>(tmp); // тут возвращаем не размер в потоке, а саму переменную tmp, чтобы тесты могли проверить еЄ н f_value и t_value
+	};
+};
+
+// —ѕ≈÷»јЋ»«ј÷»я ƒЋя —“–ќ 
+template<typename T>
+class StreamSerializer<T, typename std::enable_if<std::is_same<T, std::string>::value, T>::type>
+{
+public:
+
+	static size_t serialize(std::ostream& os, const T& value)
+	{
+		const auto pos = os.tellp();
+		const auto len = static_cast<std::uint32_t>(value.size());
+		os.write(reinterpret_cast<const char*>(&len), sizeof(len));
+		if (len > 0)
+			os.write(value.data(), len);
+		return static_cast<std::size_t>(os.tellp() - pos);
+	};
+
+	static size_t deserialize(std::istream& is, T& value)
+	{
+		std::ostringstream os;
+		std::uint32_t len;
+		is.read(reinterpret_cast<char*>(&len), sizeof(len));
+		if (len > 0)
+		{
+			os << is.rdbuf();
+			value = os.str();
+		}
+		//is.read(reinterpret_cast<char*>(const_cast<char*>(value.data())), len);
+		return static_cast<std::size_t>(len);
+	};
+};
+
+//—ѕ≈÷»јЋ»«ј÷»я ƒЋя ¬≈ “ќ–ќ¬
+template<typename T>
+class StreamSerializer<std::vector<T>>
+{
+public:
+	static size_t serialize(std::ostream& os, const std::vector<T>& value)
+	{
+		const auto pos = os.tellp();
+		const auto len = static_cast<std::uint32_t>(value.size());
+		os.write(reinterpret_cast<const char*>(&len), sizeof(len));
+		os.write(reinterpret_cast<const char*>(&value), sizeof(value));
+		return static_cast<std::size_t>(os.tellp() - pos);
 	}
-	return static_cast<std::size_t>(tmp); // тут возвращаем не размер в потоке, а саму переменную tmp, чтобы тесты могли проверить еЄ н f_value и t_value
-}
 
-
-
+	static	size_t deserialize(std::istream& is, std::vector<T>& value)
+	{
+		const auto pos = is.tellg();
+		std::uint32_t len;
+		auto size = sizeof(T);
+		is.read(reinterpret_cast<char*>(&len), sizeof(len));
+		value.resize(len);
+		is.read(reinterpret_cast<char*>(value.data()), len * size);
+		return static_cast<std::size_t>(is.tellg() - pos);
+	}
+};
 
 
