@@ -109,13 +109,14 @@ public:
 	static size_t serialize(std::ostream& os, const std::vector<T>& value)
 	{
 		const auto pos = os.tellp();
-		const auto len = static_cast<std::uint32_t>(value.size());
+		const auto len = static_cast<std::size_t>(value.size());
 		os.write(reinterpret_cast<const char*>(&len), sizeof(len));
-		for (auto& elem : value)
-		{
-			auto size = sizeof(elem);
-			os.write(reinterpret_cast<const char*>(&elem), size);
-		}
+		os.write(reinterpret_cast<const char*>(value.data()), len * sizeof(T));
+// 		for (auto& elem : value)
+// 		{
+// 			auto size = sizeof(elem);
+// 			os.write(reinterpret_cast<const char*>(&elem), size);
+// 		}
 //		os.write(reinterpret_cast<const char*>(&value), sizeof(value));
 		return static_cast<std::size_t>(os.tellp() - pos);
 	}
@@ -123,15 +124,16 @@ public:
 	static	size_t deserialize(std::istream& is, std::vector<T>& value)
 	{
 		const auto pos = is.tellg();
-		std::uint32_t len;
+		size_t len;
 		auto size = sizeof(T);
 		is.read(reinterpret_cast<char*>(&len), sizeof(len));
 		value.resize(len);
-		for (auto& elem : value)
-		{
-			auto size = sizeof(elem);
-			is.read(reinterpret_cast<char*>(&elem), size);
-		}
+		is.read(reinterpret_cast<char*>(value.data()), len * sizeof(T));
+// 		for (auto& elem : value)
+// 		{
+// 			auto size = sizeof(elem);
+// 			is.read(reinterpret_cast<char*>(&elem), size);
+// 		}
 	/*	is.read(reinterpret_cast<char*>(&value), sizeof(value));*/
 		return static_cast<std::size_t>(is.tellg() - pos);
 	}
