@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <type_traits>
 
 //template<typename T>
@@ -110,7 +111,12 @@ public:
 		const auto pos = os.tellp();
 		const auto len = static_cast<std::uint32_t>(value.size());
 		os.write(reinterpret_cast<const char*>(&len), sizeof(len));
-		os.write(reinterpret_cast<const char*>(&value), sizeof(value));
+		for (auto& elem : value)
+		{
+			auto size = sizeof(elem);
+			os.write(reinterpret_cast<const char*>(&elem), size);
+		}
+//		os.write(reinterpret_cast<const char*>(&value), sizeof(value));
 		return static_cast<std::size_t>(os.tellp() - pos);
 	}
 
@@ -121,7 +127,12 @@ public:
 		auto size = sizeof(T);
 		is.read(reinterpret_cast<char*>(&len), sizeof(len));
 		value.resize(len);
-		is.read(reinterpret_cast<char*>(value.data()), len * size);
+		for (auto& elem : value)
+		{
+			auto size = sizeof(elem);
+			is.read(reinterpret_cast<char*>(&elem), size);
+		}
+	/*	is.read(reinterpret_cast<char*>(&value), sizeof(value));*/
 		return static_cast<std::size_t>(is.tellg() - pos);
 	}
 };
