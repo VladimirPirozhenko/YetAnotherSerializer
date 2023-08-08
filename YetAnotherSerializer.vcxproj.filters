@@ -9,12 +9,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="Serializer.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Serializer.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler.h">
       <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
