@@ -114,10 +114,10 @@ public:
 		const auto len = value.size();
 		os.write(reinterpret_cast<char const*>(&len), sizeof(len));
 		os.write(reinterpret_cast<char const*>(value.data()), len * sizeof(T));
-// 		for (auto& elem : value)
+// 		for (auto& elem : value) // профайлинг показал, что так значительно медленнее
 // 		{
 // 			auto size = sizeof(elem);
-// 			os.write(reinterpret_cast<char const*>(&elem), size);
+// 			os.write(reinterpret_cast<char const*>(&elem), size); 
 // 		}
 		return static_cast<std::size_t>(os.tellp() - pos);
 	}
@@ -129,9 +129,8 @@ public:
 		//auto size = sizeof(T);
 		is.read(reinterpret_cast<char*>(&len), sizeof(len));
 		value.resize(len);
-		size_t vecSize = len * sizeof(T);
-		is.read(reinterpret_cast<char*>(value.data()), vecSize);
-// 		for (auto& elem : value)
+		is.read(reinterpret_cast<char*>(value.data()), len * sizeof(T));
+// 		for (auto& elem : value) // профайлинг показал, что так значительно медленнее
 // 		{
 // 			auto size = sizeof(elem);
 // 			is.read(reinterpret_cast<char*>(&elem), size);
